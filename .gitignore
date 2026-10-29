@@ -1,0 +1,28 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de editores e IDE
+.vscode/
+.idea/
+
+# Archivos de registro
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos generados por compilación
+dist/
+build/
+coverage/

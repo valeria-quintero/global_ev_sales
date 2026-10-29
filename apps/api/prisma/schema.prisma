@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model EvSale {
+  id         Int    @id @default(autoincrement())
+  region     String
+  category   String // Historical | Projection-APS | Projection-STEPS
+  parameter  String // EV sales | EV stock | EV sales share
+  mode       String // Cars | Buses | Vans | Trucks
+  powertrain String // BEV | PHEV | FCEV | EV
+  year       Int
+  unit       String // Vehicles | percent
+  value      Float
+
+  @@index([parameter, mode, powertrain, year])
+  @@index([region, year])
+}
