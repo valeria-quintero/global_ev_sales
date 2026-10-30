@@ -1,29 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { Prisma } from '../generated/prisma/client.js';
-
-const MAX_PAGE_SIZE = 200;
-const DEFAULT_CATEGORY = 'Historical';
-
-export interface FindSalesParams {
-    region?: string;
-    powertrain?: string;
-    mode?: string;
-    category?: string;
-    startYear?: number;
-    endYear?: number;
-    page: number;
-    pageSize: number;
-}
-
-export interface FindTrendsParams {
-    regions: string[];
-    powertrains: string[];
-    mode: string;
-    startYear?: number;
-    endYear?: number;
-    groupBy: string;
-}
+import { DEFAULT_CATEGORY } from './ev_sales.constants.js';
+import type { SalesQueryDto } from './dto/sales-query.dto.js';
+import type { TrendsQueryDto } from './dto/trends-query.dto.js';
 
 @Injectable()
 export class EvSalesService {
@@ -47,12 +27,21 @@ export class EvSalesService {
         };
     }
 
-    async findSales ({ region, powertrain, mode, category, startYear, endYear, page, pageSize }: FindSalesParams) {
-        const take = Math.min(Math.max(pageSize, 1), MAX_PAGE_SIZE);
-        const currentPage = Math.max(page, 1);
+    //el DTO valida cada año por separado, que el rango tenga sentido se revisa aquí
+    private assertYearRange (startYear?: number, endYear?: number) {
+        if (startYear !== undefined && endYear !== undefined && startYear > endYear) {
+            throw new BadRequestException('startYear no puede ser mayor que endYear');
+        }
+    }
+
+    async findSales ({ region, powertrain, mode, category, startYear, endYear, page, pageSize }: SalesQueryDto) {
+        this.assertYearRange(startYear, endYear);
+
+        const take = pageSize;
+        const currentPage = page;
 
         const where: Prisma.EvSaleWhereInput = {
-            category: category || DEFAULT_CATEGORY,
+            category,
             ...(region && { region }),
             ...(powertrain && { powertrain }),
             ...(mode && { mode }),
@@ -80,10 +69,8 @@ export class EvSalesService {
         };
     }
 
-    async findTrends ({ regions, powertrains, mode, startYear, endYear, groupBy }: FindTrendsParams) {
-        if (groupBy !== 'powertrain' && groupBy !== 'region') {
-            throw new BadRequestException('groupBy debe ser "powertrain" o "region"');
-        }
+    async findTrends ({ regions, powertrains, mode, startYear, endYear, groupBy }: TrendsQueryDto) {
+        this.assertYearRange(startYear, endYear);
 
         //siempre datos históricos de ventas en vehículos
         const rows = await this.prismaService.evSale.groupBy({
