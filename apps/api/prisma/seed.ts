@@ -31,9 +31,13 @@ async function main() {
     parse({ columns: true, trim: true, skip_empty_lines: true, bom: true }),
   );
 
+  //lista de filas pendientes por insertar
   let batch: Prisma.EvSaleCreateManyInput[] = [];
+  //cuenta lo insertado
   let total = 0;
+  //cuenta lo descartado
   let skipped = 0;
+
   let regions: string[] = []
   let powertrains: string[] = []
   let modes: string[] = []
@@ -42,15 +46,18 @@ async function main() {
   for await (const r of parser as AsyncIterable<Row>) {
     const year = Number(r.year);
     const value = Number(r.value);
+
     if (!PARAMETERS.has(r.parameter) || !Number.isInteger(year) || !Number.isFinite(value)) {
       skipped++;
       continue;
     }
+    //agrega al final de la lista
     batch.push({
       region: r.region, category: r.category, parameter: r.parameter, mode: r.mode,
       powertrain: r.powertrain, year, unit: r.unit, value,
     });
 
+    //valores únicos para los selectores
     if (!regions.includes(r.region)) {
       regions.push(r.region)
     }
@@ -73,6 +80,8 @@ async function main() {
       batch = [];
     }
   }
+
+  //para las filas sobrantes
   if (batch.length) {
     await prisma.evSale.createMany({ data: batch });
     total += batch.length;
