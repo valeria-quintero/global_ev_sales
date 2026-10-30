@@ -34,6 +34,10 @@ async function main() {
   let batch: Prisma.EvSaleCreateManyInput[] = [];
   let total = 0;
   let skipped = 0;
+  let regions: string[] = []
+  let powertrains: string[] = []
+  let modes: string[] = []
+  let years: number[] = []
 
   for await (const r of parser as AsyncIterable<Row>) {
     const year = Number(r.year);
@@ -46,6 +50,23 @@ async function main() {
       region: r.region, category: r.category, parameter: r.parameter, mode: r.mode,
       powertrain: r.powertrain, year, unit: r.unit, value,
     });
+
+    if (!regions.includes(r.region)) {
+      regions.push(r.region)
+    }
+
+    if (!powertrains.includes(r.powertrain)) {
+      powertrains.push(r.powertrain)
+    }
+
+    if (!modes.includes(r.mode)) {
+      modes.push(r.mode)
+    }
+
+    if (!years.includes(year)) {
+      years.push(year)
+    }
+
     if (batch.length >= BATCH) {
       await prisma.evSale.createMany({ data: batch });
       total += batch.length;
@@ -57,6 +78,8 @@ async function main() {
     total += batch.length;
   }
   console.log(`Insertados: ${total} | Descartados: ${skipped}`);
+
+  console.log(`Regiones: ${regions} \n ${powertrains} \n ${modes} \n ${years}`)
 }
 
 main().finally(() => prisma.$disconnect());
