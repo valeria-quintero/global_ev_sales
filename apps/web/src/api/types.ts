@@ -53,3 +53,12 @@ export interface TrendsParams {
     endYear?: number,
     groupBy?: GroupBy,
 }
+
+
+//fila de la tabla resumen por región (se calcula en el frontend a partir de /trends)
+export interface RegionSummaryRow {
+    region: string,
+    total: number,
+    growth: number | null,
+    dominant: string,
+}
