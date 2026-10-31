@@ -11,6 +11,40 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ev -d ev_sales"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ev_sales_api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ev:ev@db:5432/ev_sales?schema=public
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      # CSV para el seed: docker compose exec api npx prisma db seed
+      - ./apps/data:/app/apps/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: ev_sales_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
 
 volumes:
   pgdata:
