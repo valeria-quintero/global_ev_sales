@@ -1,50 +1,52 @@
-import { useQueries } from "@tanstack/react-query";
+import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { getTrends } from "../api/ev-api";
 import { useEvAnalyticsStore } from "../stores/use-ev-analytics-store";
-import { AGGREGATE_REGIONS, SUMMARY_POWERTRAINS, buildRegionSummary } from "../utils/region-summary";
-import { useEvFilters } from "./use-ev-filters";
+import { buildRegionSummary } from "../utils/region-summary";
 
-//resumen por región del último año
+//resumen por región del último año del rango elegido, comparado con el año anterior.
+//Obedece a los filtros del store: regiones, motores, modo y año final
 export function useEvRegionSummary() {
-    const { filters, isLoading: filtersLoading, error: filtersError } = useEvFilters()
+    const selectedRegions = useEvAnalyticsStore((s) => s.selectedRegions)
+    const selectedPowertrains = useEvAnalyticsStore((s) => s.selectedPowertrains)
     const selectedMode = useEvAnalyticsStore((s) => s.selectedMode)
+    const yearRange = useEvAnalyticsStore((s) => s.yearRange)
 
-    const latestYear = filters?.years.at(-1)
-    const previousYear = latestYear === undefined ? undefined : latestYear - 1
-    const regions = filters?.regions.filter((region) => !AGGREGATE_REGIONS.includes(region))
+    const year = yearRange[1]
+    const previousYear = year - 1
 
-    //una consulta por motor
+    //una consulta por motor: así se sabe cuál domina en cada región
     const queries = useQueries({
-        queries: SUMMARY_POWERTRAINS.map((powertrain) => ({
-            queryKey: ['ev-summary', powertrain, selectedMode, latestYear],
+        queries: selectedPowertrains.map((powertrain) => ({
+            queryKey: ['ev-summary', powertrain, selectedRegions, selectedMode, year],
             queryFn: () => getTrends({
-                regions,
+                regions: selectedRegions,
                 powertrains: [powertrain],
                 mode: selectedMode,
                 startYear: previousYear,
-                endYear: latestYear,
-                groupBy: 'region',
+                endYear: year,
+                groupBy: 'region' as const,
             }),
-            enabled: latestYear !== undefined && regions !== undefined,
             staleTime: 30_000,
+            placeholderData: keepPreviousData,
         })),
     })
 
     const allLoaded = queries.every((query) => query.data !== undefined)
 
-    const rows = allLoaded && latestYear !== undefined && previousYear !== undefined && regions
+    const rows = allLoaded
         ? buildRegionSummary(
-            Object.fromEntries(SUMMARY_POWERTRAINS.map((powertrain, i) => [powertrain, queries[i].data])),
-            regions,
-            latestYear,
+            Object.fromEntries(selectedPowertrains.map((powertrain, i) => [powertrain, queries[i].data])),
+            selectedRegions,
+            selectedPowertrains,
+            year,
             previousYear,
         )
         : []
 
     return {
         rows,
-        year: latestYear,
-        isLoading: filtersLoading || queries.some((query) => query.isLoading),
-        error: filtersError ?? queries.find((query) => query.error)?.error ?? null,
+        year,
+        isLoading: queries.some((query) => query.isLoading),
+        error: queries.find((query) => query.error)?.error ?? null,
     }
 }

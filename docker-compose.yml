@@ -34,6 +34,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      # GET /api (prefijo global + AppController) responde 200 cuando Nest ya escucha
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      # migrate deploy corre antes de arrancar el servidor
+      start_period: 30s
 
   web:
     build:
@@ -44,7 +52,8 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   pgdata:
