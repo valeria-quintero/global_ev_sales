@@ -18,13 +18,12 @@ export default function TabBar<T extends string>({ tabs, active, onChange }: Tab
     }
 
     return (
-        <div role="tablist" className="flex gap-1 border-b border-slate-200">
+        <div className="flex gap-1 border-b border-slate-200">
             {tabs.map((tab, index) => (
                 <button
                     key={tab.id}
                     id={`tab-${tab.id}`}
                     type="button"
-                    role="tab"
                     aria-selected={tab.id === active}
                     aria-controls={`panel-${tab.id}`}
                     tabIndex={tab.id === active ? 0 : -1}
