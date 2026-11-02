@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DetailedRecords from './components/DetailedRecords'
 import FiltersBar from './components/FiltersBar'
 import RegionsSummaryTable from './components/RegionsSummaryTable'
 import TabBar from './components/TabBar'
@@ -44,11 +45,7 @@ function App() {
               <VolumeShareChart />
             </div>
           )}
-          {activeTab === 'registros' && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-              Aquí irá la tabla de registros detallados con AG Grid.
-            </section>
-          )}
+          {activeTab === 'registros' && <DetailedRecords />}
         </div>
       </div>
     </main>

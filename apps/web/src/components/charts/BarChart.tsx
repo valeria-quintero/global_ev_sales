@@ -43,7 +43,7 @@ export default function CountriesBarChart() {
         <figure className="viz-root rounded-2xl border border-(--border) bg-(--surface-1) p-6 shadow-sm">
             <figcaption className="mb-4 flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-lg font-bold text-(--text-primary)">China, Europa y EE. UU.</h2>
+                    <h2 className="text-lg font-bold text-(--text-primary)">Comparativa de ventas</h2>
                     <p className="text-sm text-(--text-secondary)">
                         {selectedPowertrains.join(' + ')} · {selectedMode} · {startYear}–{endYear} · vehículos vendidos por año
                     </p>
