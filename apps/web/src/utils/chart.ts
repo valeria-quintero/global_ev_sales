@@ -3,6 +3,9 @@ const SERIES_COLORS: Record<string, string> = {
     BEV: 'var(--series-bev)',
     PHEV: 'var(--series-phev)',
     FCEV: 'var(--series-fcev)',
+    China: 'var(--series-china)',
+    Europe: 'var(--series-europe)',
+    USA: 'var(--series-usa)',
 }
 
 export function seriesColor(series: string): string {

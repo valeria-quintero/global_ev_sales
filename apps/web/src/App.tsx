@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import DetailedRecords from './components/DetailedRecords'
 import FiltersBar from './components/FiltersBar'
 import RegionsSummaryTable from './components/RegionsSummaryTable'
 import TabBar from './components/TabBar'
 import PowertrainAreaChart from './components/charts/PowertrainAreaChart'
+import CountriesBarChart from './components/charts/BarChart'
+import VolumeShareChart from './components/charts/VolumeShareChart'
 
 const TABS = [
   { id: 'resumen', label: 'Resumen' },
@@ -35,12 +38,14 @@ function App() {
 
         <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
           {activeTab === 'resumen' && <RegionsSummaryTable />}
-          {activeTab === 'tendencias' && <PowertrainAreaChart />}
-          {activeTab === 'registros' && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-              Aquí irá la tabla de registros detallados con AG Grid.
-            </section>
+          {activeTab === 'tendencias' && (
+            <div className="space-y-6">
+              <PowertrainAreaChart />
+              <CountriesBarChart />
+              <VolumeShareChart />
+            </div>
           )}
+          {activeTab === 'registros' && <DetailedRecords />}
         </div>
       </div>
     </main>

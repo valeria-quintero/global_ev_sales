@@ -15,7 +15,7 @@ function buildQuery(params: Record<string, QueryValue>): string {
     return query ? `?${query}` : ''
 }
 
-export async function request<T>(path: string): Promise<T> {
+async function request<T>(path: string): Promise<T> {
     const response = await fetch(path)
 
     if (!response.ok) {
@@ -28,6 +28,14 @@ export async function request<T>(path: string): Promise<T> {
 
 export function getSales(params: SalesParams = {}) {
     return request<SalesResponse>(`/api/ev/sales${buildQuery({ ...params })}`)
+}
+
+export async function getAllSales(params: SalesParams = {}) {
+    const first = await getSales({ ...params, page: 1, pageSize: 200 })
+    const rest = await Promise.all(
+        Array.from({ length: Math.max(0, first.totalPages - 1) }, (_, i) => getSales({ ...params, page: i + 2, pageSize: 200 })),
+    )
+    return [first, ...rest].flatMap((response) => response.data)
 }
 
 export function getFilters() {

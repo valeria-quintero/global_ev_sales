@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Colores de los gráficos. Cada motor tiene un color fijo (BEV siempre azul...): quitar uno no repinta los demás.
-   Paleta validada con validate_palette.js contra la superficie de cada modo. */
+/* Colores de los gráficos. Cada serie tiene un color fijo (BEV siempre azul...): quitar una no repinta las demás.
+   Paleta validada con validate_palette.js contra la superficie clara. */
 .viz-root {
   --surface-1: #fcfcfb;
   --text-primary: #0b0b0b;
@@ -10,22 +10,12 @@
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --border: rgba(11, 11, 11, 0.1);
-  --series-bev: #2a78d6;
-  --series-phev: #eb6834;
-  --series-fcev: #1baf7a;
-}
-
-/* Modo oscuro de los gráficos: se activa con data-theme="dark" en <html>. No sigue al sistema
-   porque el resto de la página es solo claro, y un gráfico oscuro sobre página clara se vería roto */
-:root[data-theme="dark"] .viz-root {
-  --surface-1: #1a1a19;
-  --text-primary: #f0efec;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
-  --grid: #2c2c2a;
-  --axis: #383835;
-  --border: rgba(255, 255, 255, 0.1);
-  --series-bev: #3987e5;
-  --series-phev: #d95926;
-  --series-fcev: #199e70;
+  --series-bev: #FF8042;
+  --series-phev: #00C49F;
+  --series-fcev: #FFBB28;
+  --series-china: #0088FE;
+  --series-europe: #e11d48;
+  --series-usa: #65a30d;
+  --series-volume: #FFCA88;
+  --series-share: #DE7272;
 }
