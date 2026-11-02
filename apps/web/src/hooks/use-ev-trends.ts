@@ -29,6 +29,7 @@ export function useEvTrends(groupBy: GroupBy) {
     return {
         trends: query.data,
         isLoading: query.isLoading,
+        isFetching: query.isFetching,
         error: query.error,
     }
 }

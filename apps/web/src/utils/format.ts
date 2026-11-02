@@ -6,6 +6,13 @@ const percentFormat = new Intl.NumberFormat('es-ES', {
     signDisplay: 'exceptZero',
 })
 
+//para los ejes: 5000000 -> "5 M", 500000 -> "500 mil"
+const compactFormat = new Intl.NumberFormat('es-ES', { notation: 'compact' })
+
+export function formatCompact(value: number): string {
+    return compactFormat.format(value)
+}
+
 export function formatNumber(value: number): string {
     return numberFormat.format(value)
 }
