@@ -38,11 +38,6 @@ async function main() {
   //cuenta lo descartado
   let skipped = 0;
 
-  let regions: string[] = []
-  let powertrains: string[] = []
-  let modes: string[] = []
-  let years: number[] = []
-
   for await (const r of parser as AsyncIterable<Row>) {
     const year = Number(r.year);
     const value = Number(r.value);
@@ -57,23 +52,6 @@ async function main() {
       powertrain: r.powertrain, year, unit: r.unit, value,
     });
 
-    //valores únicos para los selectores
-    if (!regions.includes(r.region)) {
-      regions.push(r.region)
-    }
-
-    if (!powertrains.includes(r.powertrain)) {
-      powertrains.push(r.powertrain)
-    }
-
-    if (!modes.includes(r.mode)) {
-      modes.push(r.mode)
-    }
-
-    if (!years.includes(year)) {
-      years.push(year)
-    }
-
     if (batch.length >= BATCH) {
       await prisma.evSale.createMany({ data: batch });
       total += batch.length;
@@ -87,8 +65,6 @@ async function main() {
     total += batch.length;
   }
   console.log(`Insertados: ${total} | Descartados: ${skipped}`);
-
-  console.log(`Regiones: ${regions} \n ${powertrains} \n ${modes} \n ${years}`)
 }
 
 main().finally(() => prisma.$disconnect());
